@@ -1,10 +1,11 @@
-import { getCustomOrders, getMetals, getSizes, getStyles } from "./database.js"
+import { getCustomOrders, getMetals, getSizes, getStyles, getType } from "./database.js"
 
 
 const buildOrderListItem = (order) => {
     const metals = getMetals()
     const sizes = getSizes()
     const styles = getStyles()
+    const types = getType()
 
     // Remember that the function you pass to find() must return true/false
     const foundMetal = metals.find(
@@ -22,9 +23,27 @@ const buildOrderListItem = (order) => {
             return style.id === order.styleId
         }
     )
-    const totalCost = foundMetal.price + foundSize.price + foundStyle.price
+    const foundType = types.find(
+        (type) => {
+            return type.id === order.typeId
+        }
+    )
+    const totalCost = () => {
+        if (foundType.type === 'Ring') {
+            const newPrice = foundMetal.price + foundSize.price + foundStyle.price
+            return newPrice
+        }
+        else if (foundType.type === 'Earring') {
+            const newPrice = foundMetal.price + foundSize.price + foundStyle.price 
+            return newPrice * 2
+        }
+        else (foundType.type === 'Necklace') ;
+            const newPrice = foundMetal.price + foundSize.price + foundStyle.price 
+            return newPrice * 4
+    }
 
-    const costString = totalCost.toLocaleString("en-US", {
+
+    const costString = totalCost().toLocaleString("en-US", {
         style: "currency",
         currency: "USD"
     })
@@ -34,12 +53,7 @@ const buildOrderListItem = (order) => {
         Order #${order.id} costs ${costString} and was placed on ${order.timestamp}
     </li>`
 }
-
 export const Orders = () => {
-    /*
-        Can you explain why the state variable has to be inside
-        the component function for Orders, but not the others?
-    */
     const orders = getCustomOrders()
 
     let html = "<ul>"
